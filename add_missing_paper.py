@@ -30,8 +30,8 @@ if __name__ == '__main__':
     """
 
     # query string of papers to look for
-    #q = 'cat:cs.CV+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.AI+OR+cat:cs.NE+OR+cat:cs.RO'
-    q = 'cat:astro-ph.CO+OR+cat:astro-ph.HE+OR+cat:astro-ph.IM+OR+cat:gr-qc',
+    #q = 'cat:astro-ph.CO+OR+cat:astro-ph.HE+OR+cat:astro-ph.IM+OR+cat:astro-ph.gr-qc',
+    q = 'id_list=2208.11393',
 
     pdb = get_papers_db(flag='c')
     mdb = get_metas_db(flag='c')
@@ -44,7 +44,8 @@ if __name__ == '__main__':
     # fetch the latest papers
     total_updated = 0
     zero_updates_in_a_row = 0
-    for k in range(args.start, args.start + args.num, 100):
+    #for k in range(args.start, args.start + args.num, 100):
+    if True:
         logging.info('querying arxiv api for query %s at start_index %d' % (q, k))
 
         # attempt to fetch a batch of papers from arxiv api
@@ -54,14 +55,14 @@ if __name__ == '__main__':
                 resp = get_response(search_query=q, start_index=k)
                 papers = parse_response(resp)
                 time.sleep(0.5)
-                if len(papers) == 100 or len(papers) == args.start + args.num - k:
+                if len(papers) == 100:
                     break # otherwise we have to try again
             except Exception as e:
                 logging.warning(e)
                 logging.warning("will try again in a bit...")
                 ntried += 1
-                if ntried > 5:
-                    logging.error("ok we tried 5 times, something is srsly wrong. exitting.")
+                if ntried > 1000:
+                    logging.error("ok we tried 1,000 times, something is srsly wrong. exitting.")
                     sys.exit()
                 time.sleep(2 + random.uniform(0, 4))
 
