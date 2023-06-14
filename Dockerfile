@@ -2,7 +2,7 @@
 # Or better, this: https://github.com/tiangolo/uwsgi-nginx-flask-docker
 
 #FROM ubuntu:latest
-FROM tiangolo/uwsgi-nginx-flask:python3.7
+FROM tiangolo/uwsgi-nginx-flask:python3.10
 
 RUN apt-get update -y && \
     apt-get install -y python3-pip python3-dev build-essential && \
