@@ -427,7 +427,7 @@ def process_selections():
 
     return redirect(url_for('profile'))
 
-`
+
 
 @app.route('/zotero')
 def stats():
