@@ -1,7 +1,7 @@
 # m h  dom mon dow   command$
-0 3 * * * cd /app && /usr/local/bin/python3 /app/arxiv_daemon.py --num 2000 >> /app/arxiv_daemon.log 2>&1
-0 4 * * * cd /app && /usr/local/bin/python3 /app/compute.py >> /app/compute.log 2>&1
-0 5 * * * cd /app && /usr/local/bin/python3 /app/thumb_daemon.py >> /app/thumb_daemon.log 2>&1
-0 6 * * 1 cd /app && /usr/local/bin/python3 /app/send_emails.py --time-delta 7 --num-recommendations 20 >> /app/send_emails.log 2>&1
+#0 3 * * * cd /app && /usr/local/bin/python3 /app/arxiv_daemon.py --num 2000 >> /app/arxiv_daemon.log 2>&1
+#0 4 * * * cd /app && /usr/local/bin/python3 /app/compute.py >> /app/compute.log 2>&1
+#0 5 * * * cd /app && /usr/local/bin/python3 /app/thumb_daemon.py >> /app/thumb_daemon.log 2>&1
+#0 6 * * 1 cd /app && /usr/local/bin/python3 /app/send_emails.py --time-delta 7 --num-recommendations 20 >> /app/send_emails.log 2>&1
 # This extra line makes it a valid cron
 
