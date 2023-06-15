@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block variables %}
+{% endblock %}
+
+{% block content %}
+<div id="profilewrap">
+
+    {% if user %}
+    <div>
+        <div>
+            <div><b>Current session</b></div>
+            <div>Logged in user: {{ user }}</div>
+        </div>
+        <br>
+        <div>
+            <div><b>Create tags from Zotero database</b></div>
+            <div>
+                <a href="https://www.zotero.org/"
+                    id="zotero-external-link">Zotero</a> is a great open-source
+                reference manager, used by many arxiv users. Often users have
+                extensive Zotero libraries that they put much more thought and
+                effort into than their arxiv-sanity tags. Therefore it is
+                convenient to allow arxiv-sanity to import user's Zotero
+                library to create tags. This is especially useful for Zotero
+                users that want to try out arxiv-sanity for the first time.
+            </div>
+
+            <div>
+                <form id="email-form" action="{{ url_for('upload_zotero_json') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="zotero-library" placeholder="Zotero Library JSON" value="{{ zoterolib }}">
+                    </div>
+                    <div class="form-group">
+                        <input type="file" name="jsonfile" accept=".json">
+                    </div>
+                    <input type="submit" class="btn" value="Upload">
+                </form>
+
+
+                {% if papers %}
+
+                    {% if error %}
+                    <div>
+                        Error: {{ error }}
+                    </div>
+
+                    {% else %}
+                    <form action="{{ url_for('process_selections') }}" method="post">
+                        <div>
+                            <label>Papers:</label>
+                            <select name="papers" multiple>
+                                {% for paper in papers %}
+                                    <option value="{{ paper }}">{{ paper }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label>Tags:</label>
+                            <select name="tags" multiple>
+                                {% for tag in tags %}
+                                    <option value="{{ tag }}">{{ tag }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="submit" value="Process">
+                    </form>
+                    {% endif %}
+                {% endif %}
+
+            </div>
+        </div>
+        <br>
+        <div>
+            <a href="{{ url_for('logout') }}">Log out</a>
+        </div>
+    </div>
+    {% else %}
+    <div>
+
+        <div id="profile-warning">
+            <p>
+            Not logged in! <br><br>
+            Okay, arxiv-sanity-lite uses a super lite version of
+            "user accounts" where there are no passwords. Basically, you can "log in"
+            with any arbitrary username. If you want to share your library with a
+            friend, you can just tell them the username. And if you'd like to keep your
+            account private, just make your username be something unique
+            and write it down somewhere safe.
+            </p>
+            <b>TLDR: there are no passwords!</b>
+        </div>
+
+        <form id="profile-login-form" action="/login" method="POST">
+            <div class="form-group">
+              <label>Username:</label>
+              <input class="form-control" type="text" name="username">
+            </div>
+            <button type="submit" class="btn">Log in</button>
+        </form>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block elements %}
+{% endblock %}

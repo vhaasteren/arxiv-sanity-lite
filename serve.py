@@ -13,6 +13,7 @@ import time
 from random import shuffle
 
 import numpy as np
+import tempfile
 from sklearn import svm
 
 from flask import Flask, request, redirect, url_for
@@ -22,6 +23,8 @@ from flask import session
 
 from aslite.db import get_papers_db, get_metas_db, get_tags_db, get_last_active_db, get_email_db
 from aslite.db import load_features
+
+from zotero import create_uncompressed_db, add_zotero_entries_to_new_tag
 
 # -----------------------------------------------------------------------------
 # inits and globals
@@ -362,6 +365,76 @@ def stats():
         context['thr_%d' % thr] = len([t for t in times if t > tnow - thr*60*60])
 
     return render_template('stats.html', **context)
+
+@app.route('/upload_zotero_json', methods=['POST'])
+def upload_zotero_json():
+    context = default_context()
+    error=""
+
+    if 'jsonfile' not in request.files:
+        error = 'No file part'
+
+    file = request.files['jsonfile']
+    if file.filename == '':
+        error = 'No selected file'
+
+    if file and file.filename.endswith('.json'):
+        data = json.load(file)
+        # now you have access to the data in the json file
+
+        # save data in session
+        session['data'] = data
+
+        # create sets of unique papers and tags
+        # MODIFY THIS
+        papers = {item for item in data}
+        tags = {tag for item in data for tag in data[item]}
+
+        # Also pass the context here. JSON is in the session
+        return render_template('zotero.html', papers=papers, tags=tags, **context)
+
+    else:
+        error = 'Not a JSON file'
+
+    # From the context, perhaps also determine the tag that needs to be added
+    # and perhaps we can also parse the tags in the Zotero library and use those?
+
+    return render_template('zotero.html', error=error)
+
+
+@app.route('/process_selections', methods=['POST'])
+def process_selections():
+    selected_papers = request.form.getlist('papers')
+    selected_tags = request.form.getlist('tags')
+
+    # The uploaded json zotero library
+    data = session.get('data', {})
+
+    # Create a tempfile
+    with tempfile.NamedTemporaryFile() as temp_db:
+
+        # process data based on selected_papers and selected_tags...
+        #from zotero import create_uncompressed_db, add_zotero_entries_to_new_tag
+        create_uncompressed_db(uncompressed_db_fn=temp_db.name)
+
+        add_zotero_entries_to_new_tag(
+                username=g.user,
+                zotlib = data,
+                new_tag='zotero',
+                uncompressed_db_fn=temp_db.name,
+                doi_chunk_size=900
+          )
+
+    return redirect(url_for('profile'))
+
+`
+
+@app.route('/zotero')
+def stats():
+    context = default_context()
+
+    return render_template('zotero.html', **context)
+
 
 @app.route('/about')
 def about():
