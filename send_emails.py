@@ -60,7 +60,7 @@ body {
 <body>
 
 <br><br>
-<div>Hi! Here are your <a href="https://arxiv-sanity-lite.com">arxiv-sanity-lite</a> recommendations. __STATS__</div>
+<div>Hi! Here are your <a href="https://arxiv-sanity.vhaasteren.com">arxiv-sanity-lite</a> recommendations. __STATS__</div>
 <br><br>
 
 <div>
@@ -69,7 +69,7 @@ body {
 
 <br><br>
 <div>
-To stop these emails remove your email in your <a href="https://arxiv-sanity-lite.com/profile">account</a> settings. (your account is __ACCOUNT__).
+To stop these emails remove your email in your <a href="https://arxiv-sanity.vhaasteren.com/profile">account</a> settings. (your account is __ACCOUNT__).
 </div>
 <div> <3, arxiv-sanity-lite. </div>
 
@@ -159,7 +159,7 @@ def render_recommendations(user, tags, tag_pids, tag_scores):
         if len(summary) == 500:
             summary += '...'
         # create the url that will feature this paper on top and also show the most similar papers
-        url = 'https://arxiv-sanity-lite.com/?rank=pid&pid=' + pid
+        url = 'https://arxiv-sanity.vhaasteren.com/?rank=pid&pid=' + pid
         parts.append(
 """
 <tr>
@@ -206,7 +206,6 @@ def send_email(to, html):
     sg = sendgrid.SendGridAPIClient(api_key=api_key)
 
     # construct the email
-    #from_email = Email("admin@arxiv-sanity-lite.com")
     from_email = Email("arxiv-sanity@proton.me")
     to_email = To(to)
     subject = tnow_str + " Arxiv Sanity Lite recommendations"
