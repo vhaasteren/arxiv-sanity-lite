@@ -430,7 +430,7 @@ def process_selections():
 
 
 @app.route('/zotero')
-def stats():
+def zotero():
     context = default_context()
 
     return render_template('zotero.html', **context)
