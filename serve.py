@@ -20,11 +20,12 @@ from flask import Flask, request, redirect, url_for
 from flask import render_template
 from flask import g # global session-level object
 from flask import session
+import json
 
 from aslite.db import get_papers_db, get_metas_db, get_tags_db, get_last_active_db, get_email_db
 from aslite.db import load_features
 
-from zotero import create_uncompressed_db, add_zotero_entries_to_new_tag
+from zotero import create_uncompressed_db, compile_new_zotero_tags, add_entry_to_tags
 
 # -----------------------------------------------------------------------------
 # inits and globals
@@ -387,11 +388,26 @@ def upload_zotero_json():
 
         # create sets of unique papers and tags
         # MODIFY THIS
-        papers = {item for item in data}
-        tags = {tag for item in data for tag in data[item]}
+        with tempfile.NamedTemporaryFile() as temp_db:
+
+            # process data based on selected_papers and selected_tags...
+            #from zotero import create_uncompressed_db, add_new_zotero_tags
+            create_uncompressed_db(uncompressed_db_fn=temp_db.name)
+
+            tags = compile_new_zotero_tags(
+                    username=g.user,
+                    zotlib = data,
+                    new_tag='zotero',
+                    uncompressed_db_fn=temp_db.name,
+                    doi_chunk_size=900
+              )
+
+        all_tags = list(tags.keys())
+        all_papers = list(set([aid for (tag, aid_l) in tags.items() for aid in aid_l]))
+        session['tags'] = tags
 
         # Also pass the context here. JSON is in the session
-        return render_template('zotero.html', papers=papers, tags=tags, **context)
+        return render_template('zotero.html', papers=all_papers, tags=all_tags, **context)
 
     else:
         error = 'Not a JSON file'
@@ -409,21 +425,17 @@ def process_selections():
 
     # The uploaded json zotero library
     data = session.get('data', {})
+    tags = session.get('tags', {})
 
-    # Create a tempfile
-    with tempfile.NamedTemporaryFile() as temp_db:
-
-        # process data based on selected_papers and selected_tags...
-        #from zotero import create_uncompressed_db, add_zotero_entries_to_new_tag
-        create_uncompressed_db(uncompressed_db_fn=temp_db.name)
-
-        add_zotero_entries_to_new_tag(
-                username=g.user,
-                zotlib = data,
-                new_tag='zotero',
-                uncompressed_db_fn=temp_db.name,
-                doi_chunk_size=900
-          )
+    for new_tag, arxiv_ids in tags.items():
+        for arxiv_id in arxiv_ids:
+            add_entry_to_tags(
+                g.user,
+                new_tag,
+                arxiv_id,
+                selected_tags,
+                selected_papers
+            )
 
     return redirect(url_for('profile'))
 

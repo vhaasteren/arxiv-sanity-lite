@@ -16,7 +16,15 @@ body {
 #home-link {
     display: inline-block;
  }
+ #zotero-link {
+    float: right;
+    margin: 0 10px 0 10px;
+ }
  #stats-link {
+    float: right;
+    margin: 0 10px 0 10px;
+ }
+ #about-link {
     float: right;
     margin: 0 10px 0 10px;
  }
