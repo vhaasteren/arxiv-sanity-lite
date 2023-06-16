@@ -93,6 +93,8 @@ if __name__ == '__main__':
     for backlog_item in arxiv_backlog_raw:
         try:
             arxiv_backlog.append(backlog_item_to_api(backlog_item))
+        except KeyError:
+            pass
 
 
     # process the batch of retrieved papers
